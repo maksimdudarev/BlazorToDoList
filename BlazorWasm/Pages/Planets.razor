@@ -1,0 +1,80 @@
+﻿@page "/planets"
+@using BlazorWasm.Data
+@using BlazorWasm.Models
+@using BlazorWasm.Components
+@inject IPlanetService PlanetService
+
+<h1>Planets</h1>
+
+<div>
+    <input @oninput="FilterPlanets" placeholder="Filter planets" />
+</div>
+
+<div>
+    @foreach (var planet in _planets)
+    {
+        <figure @onclick="(() => { _editPlanet = _planets.Single(p => p.Name == planet.Name); })">
+            <img alt="" src="@planet.ImageUrl" style="width:200px" />
+            <figcaption>@planet.Name</figcaption>
+        </figure>
+    }
+</div>
+
+@if (_editPlanet != null)
+{
+    <PlanetDetails Planet="@_editPlanet" OnClosePlanetDetails="@(() => { _editPlanet = null; })" />
+}
+
+<div>
+    <h2>Add Planet</h2>
+
+    <input @bind="_newPlanet.Name" placeholder="Name" />
+    <input @bind="_newPlanet.ImageUrl" placeholder="Image Url" style="width:350px" />
+
+    <button class="btn btn-primary" @onclick="AddPlanet">Add Planet</button>
+
+    <span class="text-danger @(_isNewPlanetAdded ? "hidden" : string.Empty)">
+        The planet already exists.
+    </span>
+</div>
+
+<div class="row">
+    <div class="pl-3 pt-1">
+        <h3 class="card-title text-primary">Planet names are &copy;1974-1981 <a href="https://www.bbc.co.uk/programmes/b006q2x0">BBC</a>.</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="pl-1 text-muted">
+        Planet images are courtesy of the <a href="https://www.nasa.gov/"> National Aeronautics and Space Administration (NASA)</a>.
+    </div>
+</div>
+@*<div style="position:absolute;bottom:0;color:white">
+    <p>
+        Planet names are &copy;1974-1981 <a href="https://www.bbc.co.uk/programmes/b006q2x0">BBC</a>.
+    </p>
+    <p>
+        Planet images are courtesy of the <a href="https://www.nasa.gov/"> National Aeronautics and Space Administration (NASA)</a>.
+    </p>
+</div>*@
+
+@code {
+    private IEnumerable<Planet> _planets;
+    private Planet _newPlanet = new Planet();
+    private bool _isNewPlanetAdded = true;
+    private Planet _editPlanet;
+
+    protected override void OnInitialized()
+    {
+        _planets = PlanetService.GetPlanets();
+    }
+
+    private void FilterPlanets(ChangeEventArgs e)
+    {
+        _planets = PlanetService.GetPlanets(e.Value.ToString());
+    }
+
+    private void AddPlanet()
+    {
+        _isNewPlanetAdded = PlanetService.AddPlanet(_newPlanet);
+    }
+}

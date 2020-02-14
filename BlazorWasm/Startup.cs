@@ -1,3 +1,4 @@
+using BlazorWasm.Data;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -7,6 +8,7 @@ namespace BlazorWasm
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IPlanetService, PlanetService>();
         }
 
         public void Configure(IComponentsApplicationBuilder app)
